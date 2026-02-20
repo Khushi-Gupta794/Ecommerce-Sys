@@ -13,6 +13,8 @@ import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +38,7 @@ public class EcomController {
     // ----------- Queries ------------
 
     @QueryMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public List<Product> getAllProducts() {
         logger.info("Fetching all products");
         return productRepo.findAll();
@@ -47,6 +50,7 @@ public class EcomController {
     }
 
     @QueryMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public List<User> getAllUsers() {
         logger.info("fetching all users");
         return userRepo.findAll();
@@ -68,6 +72,7 @@ public class EcomController {
     }
 
     @MutationMapping
+    @PreAuthorize("hasRole('USER')")
     public Product createProduct(@Argument String name,
                                  @Argument double price,
                                  @Argument int stock) {
@@ -88,9 +93,11 @@ public class EcomController {
     }
 
     @MutationMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public Order createOrder(@Argument Long userId,
                              @Argument Long productId,
                              @Argument int quantity){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
         logger.info("creating order with userId={} productId={} quantity={}", userId, productId,quantity);
         User user = userRepo.findById(userId).orElseThrow(() ->

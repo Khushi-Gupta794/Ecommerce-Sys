@@ -45,6 +45,7 @@ public class EcomController {
     }
 
     @QueryMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public Product getProductById(@Argument Long id) {
         return productRepo.findById(id).orElse(null);
     }
@@ -72,7 +73,7 @@ public class EcomController {
     }
 
     @MutationMapping
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('ADMIN')")
     public Product createProduct(@Argument String name,
                                  @Argument double price,
                                  @Argument int stock) {
@@ -93,11 +94,12 @@ public class EcomController {
     }
 
     @MutationMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('USER')")
     public Order createOrder(@Argument Long userId,
                              @Argument Long productId,
                              @Argument int quantity){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName();
 
         logger.info("creating order with userId={} productId={} quantity={}", userId, productId,quantity);
         User user = userRepo.findById(userId).orElseThrow(() ->

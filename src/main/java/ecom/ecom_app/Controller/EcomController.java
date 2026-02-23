@@ -21,10 +21,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
 
 @Controller
+
 
 public class EcomController {
     private static final Logger logger =
@@ -75,8 +77,8 @@ public class EcomController {
             throw new RuntimeException("User already exists");
         }
         User user= new User();
-        user.setName(user.getName());
-        user.setEmail(user.getEmail());
+        user.setName(name);
+        user.setEmail(email);
         user.setPassword(passwordEncoder.encode(password));
         user.setRole("USER");  //setting default role for user register inorder to verify the token
         return userRepo.save(user);
@@ -122,17 +124,17 @@ public class EcomController {
 
     @MutationMapping
     @PreAuthorize("hasRole('USER')")
-    public Order createOrder(@Argument Long userId,
+    public Order createOrder(
                              @Argument Long productId,
                              @Argument int quantity){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String username = auth.getName();
+        String email = auth.getName();
 
-        logger.info("creating order with userId={} productId={} quantity={}", userId, productId,quantity);
-        User user = userRepo.findById(userId).orElseThrow(() ->
+        logger.info("creating order with email={} productId={} quantity={}",email, productId,quantity);
+        User user = userRepo.findByEmail(email).orElseThrow(() ->
         {
-            logger.error("user not found with userId={}", userId);
-            return new RuntimeException("user not found");
+            logger.error("user not found with email={}", email);
+            return new RuntimeException("email not found");
         });
 
         Product product = productRepo.findById(productId).orElseThrow(() -> new ProductNotFoundExp("Product not found"));//custom exception

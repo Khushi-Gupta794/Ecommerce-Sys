@@ -53,7 +53,7 @@ public class SecurityConfig {
         http.csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/graphiql").permitAll()
-                        .requestMatchers("/graphiql").permitAll()
+                        .requestMatchers("/graphql").permitAll()
                         .anyRequest().authenticated())
                         .sessionManagement(session ->
                                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)

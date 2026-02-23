@@ -38,7 +38,7 @@ public class User {
     private String email;
     private String password;
 
-    @Column(nullable = false)
+    //@Column(nullable = false)
     private String role;
 
     public String getRole() {

@@ -2,6 +2,8 @@ type User {
     id: ID
     name: String
     email: String
+    role : String
+    password:String
 }
 
 type Product {
@@ -30,17 +32,13 @@ type Query {
     getAllProducts: [Product]
     getProductById(id: ID!): Product
     getAllUsers: [User]
+    getAllOrders: [Order]
 }
 
 type Mutation {
-    createUser(name: String!, email: String!): User
-    createProduct(name: String!, price: Float!, stock: Int!): Product
+     registerUser(name: String!, email: String!, password: String!): User
+        loginUser(name: String!, email: String!, password: String!): String
+        createProduct(name: String!, price: Float!, stock: Int!): Product
+        createOrder(productId: ID!, quantity: Int!): Order
 }
 
-extend type Query {
-    getAllOrders: [Orders]
-}
-
-extend type Mutation {
-    createOrder(userId: ID!, productId: ID!, quantity: Int!): Orders
-}

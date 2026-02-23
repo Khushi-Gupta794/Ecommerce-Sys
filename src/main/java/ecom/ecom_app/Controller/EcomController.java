@@ -9,7 +9,10 @@ import ecom.ecom_app.ProductNotFoundExp;
 import ecom.ecom_app.Repo.OrderRepo;
 import ecom.ecom_app.Repo.ProductRepo;
 import ecom.ecom_app.Repo.UserRepo;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
@@ -51,6 +54,7 @@ public class EcomController {
 
     @QueryMapping
     @PreAuthorize("hasRole('ADMIN')")
+    @Cacheable(value = "products")
     public List<Product> getAllProducts() {
         logger.info("Fetching all products");
         return productRepo.findAll();
@@ -58,6 +62,7 @@ public class EcomController {
 
     @QueryMapping
     @PreAuthorize("hasRole('ADMIN')")
+    @Cacheable(value = "product", key = "#id")
     public Product getProductById(@Argument Long id) {
         return productRepo.findById(id).orElse(null);
     }
@@ -102,6 +107,7 @@ public class EcomController {
 
     @MutationMapping
     @PreAuthorize("hasRole('ADMIN')")
+    @CacheEvict(value = {"products", "product"}, allEntries = true)
     public Product createProduct(@Argument String name,
                                  @Argument double price,
                                  @Argument int stock) {
@@ -118,12 +124,14 @@ public class EcomController {
     //query for all orders-
     @QueryMapping
     @PreAuthorize("hasRole('ADMIN')")
+    @Cacheable(value = "orders")
     public List<Order> getAllOrders(){
         return orderRepo.findAll();
     }
 
     @MutationMapping
     @PreAuthorize("hasRole('USER')")
+    @CacheEvict(value = {"orders"}, allEntries = true)
     public Order createOrder(
                              @Argument Long productId,
                              @Argument int quantity){

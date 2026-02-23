@@ -13,7 +13,7 @@ type Product {
     stock: Int
 }
 
-type Orders {
+type Order {
     id: ID
     totalAmount: Float
     user: User

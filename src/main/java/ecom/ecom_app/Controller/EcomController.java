@@ -1,5 +1,6 @@
 package ecom.ecom_app.Controller;
 
+import ecom.ecom_app.Config.JwtUtil;
 import ecom.ecom_app.Entity.Order;
 import ecom.ecom_app.Entity.OrderItem;
 import ecom.ecom_app.Entity.Product;
@@ -13,8 +14,10 @@ import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 @Controller
+
 public class EcomController {
     private static final Logger logger =
             LoggerFactory.getLogger(EcomController.class);
@@ -34,6 +38,12 @@ public class EcomController {
 
     @Autowired
     private OrderRepo orderRepo;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private JwtUtil jwtUtil;
 
     // ----------- Queries ------------
 
@@ -59,17 +69,33 @@ public class EcomController {
 
     // ----------- Mutations ------------
 
-    @PreAuthorize("hasRole('USER')")
     @MutationMapping
-    public User createUser(@Argument String name,
-                           @Argument String email) {
-        logger.info("creating the user",name);
-
-        User user = new User();
-        user.setName(name);
-        user.setEmail(email);
-
+    public User registerUser(@Argument String name, @Argument String email, @Argument String password){
+        if(userRepo.findByEmail(email).isPresent()){
+            throw new RuntimeException("User already exists");
+        }
+        User user= new User();
+        user.setName(user.getName());
+        user.setEmail(user.getEmail());
+        user.setPassword(passwordEncoder.encode(password));
+        user.setRole("USER");  //setting default role for user register inorder to verify the token
         return userRepo.save(user);
+    }
+
+   // @PreAuthorize("hasRole('USER')")
+    @MutationMapping
+    public String loginUser(@Argument String name,
+                           @Argument String email, @Argument String password) {
+       // logger.info("creating the user",name);
+        User user = userRepo.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
+
+        if(!passwordEncoder.matches(password, user.getPassword())){
+            throw new RuntimeException("Invalid Credentials");
+        }
+        return jwtUtil.generateToken(user.getEmail(), user.getRole());
+
+
+
     }
 
     @MutationMapping
@@ -89,6 +115,7 @@ public class EcomController {
 
     //query for all orders-
     @QueryMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public List<Order> getAllOrders(){
         return orderRepo.findAll();
     }

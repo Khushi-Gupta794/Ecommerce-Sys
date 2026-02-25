@@ -1,10 +1,12 @@
 package ecom.ecom_app.Entity;
 
 import jakarta.persistence.*;
+import lombok.ToString;
 
 import java.io.Serializable;
 
 @Entity
+@ToString(exclude = "password")
 @Table(name = "users")
 public class User implements Serializable {
     @Id

@@ -1,11 +1,13 @@
 package ecom.ecom_app.Entity;
 
 import jakarta.persistence.*;
+import lombok.ToString;
 
 import java.io.Serializable;
 import java.util.List;
 
 @Entity
+@ToString
 @Table(name = "orderdetails")
 public class Order implements Serializable {
     @Id

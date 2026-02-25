@@ -1,4 +1,5 @@
 package ecom.ecom_app.Service;
+import ecom.ecom_app.AOP.CustomAnnotationAop;
 import ecom.ecom_app.Entity.*;
 import ecom.ecom_app.ProductNotFoundExp;
 import ecom.ecom_app.Repo.OrderRepo;
@@ -45,7 +46,7 @@ public class EcomService {
     }
 
     // -------- Mutations --------
-
+    @CustomAnnotationAop("User registration")
     @Transactional
     public User registerUser(String name, String email, String password) {
 
@@ -79,6 +80,7 @@ public class EcomService {
         return productRepo.save(product);
     }
 
+    @CustomAnnotationAop("Creating new order")
     @Transactional
     public Order createOrder(Long productId, int quantity, String email){
 

@@ -1,10 +1,12 @@
 package ecom.ecom_app.Entity;
 
 import jakarta.persistence.*;
+import lombok.ToString;
 
 import java.io.Serializable;
 
 @Entity
+@ToString
 public class OrderItem implements Serializable {
 
 @Id

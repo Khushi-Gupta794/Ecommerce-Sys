@@ -33,6 +33,7 @@ type Query {
     getProductById(id: ID!): Product
     getAllUsers: [User]
     getAllOrders: [Order]
+    getAllUserCached:[User]
 }
 
 type Mutation {

@@ -19,4 +19,5 @@ public interface UserRepo extends JpaRepository<User,Long> {
     @Query("SELECT u FROM User u")
     @QueryHints(@QueryHint(name = "org.hibernate.cacheable", value = "true"))
     List<User> findAllCached();
+    //direct storing of list of values is not done in cache therefore by using query it can be done
 }

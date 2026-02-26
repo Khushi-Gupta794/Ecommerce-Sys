@@ -2,12 +2,17 @@ package ecom.ecom_app.Entity;
 
 import jakarta.persistence.*;
 import lombok.ToString;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import java.io.Serializable;
 
 @Entity
 @ToString(exclude = "password")
 @Table(name = "users")
+@Cacheable
+@org.hibernate.annotations.Cache(
+        usage = CacheConcurrencyStrategy.READ_WRITE
+)
 public class User implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

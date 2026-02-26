@@ -3,6 +3,7 @@ package ecom.ecom_app.Controller;
 
 import ecom.ecom_app.Config.JwtUtil;
 import ecom.ecom_app.Entity.*;
+import ecom.ecom_app.Repo.UserRepo;
 import ecom.ecom_app.Service.EcomService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,18 +32,21 @@ public class MainController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private UserRepo userRepo;
+
     // -------- Queries --------
 
     @QueryMapping
     @PreAuthorize("hasRole('ADMIN')")
-    @Cacheable(value = "products")
+   // @Cacheable(value = "products")
     public List<Product> getAllProducts() {
         return ecomService.getAllProducts();
     }
 
     @QueryMapping
     @PreAuthorize("hasRole('ADMIN')")
-    @Cacheable(value = "product", key = "#id")
+ //   @Cacheable(value = "product", key = "#id")
     public Product getProductById(@Argument Long id) {
         return ecomService.getProductById(id);
     }
@@ -55,7 +59,7 @@ public class MainController {
 
     @QueryMapping
     @PreAuthorize("hasRole('ADMIN')")
-    @Cacheable(value = "orders")
+  //  @Cacheable(value = "orders")
     public List<Order> getAllOrders(){
         return ecomService.getAllOrders();
     }
@@ -85,7 +89,7 @@ public class MainController {
 
     @MutationMapping
     @PreAuthorize("hasRole('ADMIN')")
-    @CacheEvict(value = {"products", "product"}, allEntries = true)
+    //  @CacheEvict(value = {"products", "product"}, allEntries = true)
     public Product createProduct(@Argument String name,
                                  @Argument double price,
                                  @Argument int stock) {
@@ -94,7 +98,7 @@ public class MainController {
 
     @MutationMapping
     @PreAuthorize("hasRole('USER')")
-    @CacheEvict(value = {"orders"}, allEntries = true)
+   // @CacheEvict(value = {"orders"}, allEntries = true)
     public Order createOrder(@Argument Long productId,
                              @Argument int quantity){
 
@@ -103,6 +107,12 @@ public class MainController {
         String email = auth.getName();
 
         return ecomService.createOrder(productId, quantity, email);
+    }
+
+    //query cached
+    @QueryMapping
+    List<User> getAllUserCached(){
+        return userRepo.findAllCached();
     }
 }
 

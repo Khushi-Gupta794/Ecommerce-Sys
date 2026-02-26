@@ -2,11 +2,16 @@ package ecom.ecom_app.Entity;
 
 import jakarta.persistence.*;
 import lombok.ToString;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import java.io.Serializable;
 
 @Entity
 @ToString
+@Cacheable
+@org.hibernate.annotations.Cache(
+        usage = CacheConcurrencyStrategy.READ_WRITE
+)
 public class OrderItem implements Serializable {
 
 @Id

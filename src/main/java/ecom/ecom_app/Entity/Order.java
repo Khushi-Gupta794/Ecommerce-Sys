@@ -2,6 +2,7 @@ package ecom.ecom_app.Entity;
 
 import jakarta.persistence.*;
 import lombok.ToString;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import java.io.Serializable;
 import java.util.List;
@@ -9,6 +10,9 @@ import java.util.List;
 @Entity
 @ToString
 @Table(name = "orderdetails")
+@org.hibernate.annotations.Cache(
+        usage = CacheConcurrencyStrategy.READ_WRITE
+)
 public class Order implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

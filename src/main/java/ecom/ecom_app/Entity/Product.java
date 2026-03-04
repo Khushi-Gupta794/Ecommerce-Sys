@@ -41,15 +41,15 @@ public class Product implements Serializable {
         this.price = price;
     }
 
-    public int getStock() {
-        return stock;
-    }
+//    public int getStock() {
+//        return stock;
+//    }
 
-    public void setStock(int stock) {
-        this.stock = stock;
-    }
+//    public void setStock(int stock) {
+//        this.stock = stock;
+//    }
 
     private String name;
     private double price;
-    private int stock;
+   // private int stock;
 }

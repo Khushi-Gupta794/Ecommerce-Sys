@@ -10,7 +10,11 @@ type Product {
     id: ID
     name: String
     price: Float
-    stock: Int
+}
+
+type Inventory {
+    productId: ID
+    availableStock: Int
 }
 
 type Order {
@@ -31,6 +35,7 @@ type OrderItem{
 type Query {
     getAllProducts: [Product]
     getProductById(id: ID!): Product
+
     getAllUsers: [User]
     getAllOrders: [Order]
     getAllUserCached:[User]
@@ -39,7 +44,11 @@ type Query {
 type Mutation {
      registerUser(name: String!, email: String!, password: String!): User
         loginUser(name: String!, email: String!, password: String!): String
+
         createProduct(name: String!, price: Float!, stock: Int!): Product
+
+
+        createInventory(productId: ID!, stock: Int!): String
         createOrder(productId: ID!, quantity: Int!): Order
 }
 

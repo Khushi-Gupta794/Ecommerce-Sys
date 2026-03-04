@@ -9,7 +9,7 @@ import java.util.TimeZone;
 
 @SpringBootApplication
 @EnableCaching
-@EnableFeignClients
+@EnableFeignClients(basePackages = "ecom.ecom_app.FeignClient")
 public class    EcomAppApplication {
 
 	public static void main(String[] args) {

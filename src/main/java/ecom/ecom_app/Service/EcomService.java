@@ -1,5 +1,6 @@
 package ecom.ecom_app.Service;
 import ecom.ecom_app.AOP.CustomAnnotationAop;
+import ecom.ecom_app.DTO.InventoryRequest;
 import ecom.ecom_app.Entity.*;
 import ecom.ecom_app.FeignClient.InventoryClient;
 import ecom.ecom_app.ProductNotFoundExp;
@@ -77,12 +78,20 @@ public class EcomService {
     @Transactional
     public Product createProduct(String name, double price, int stock) {
 
-        Product product = new Product();
-        product.setName(name);
-        product.setPrice(price);
-        product.setStock(stock);
+      Product product = new Product();
+      product.setName(name);
+      product.setPrice(price);
+      //  product.setStock(stock);
 
-        return productRepo.save(product);
+        Product savedProduct = productRepo.save(product);
+       //for stock save through dto
+        InventoryRequest inventoryRequest = new InventoryRequest();
+        inventoryRequest.setProductId(savedProduct.getId());
+        inventoryRequest.setAvailableStock(stock);
+
+        inventoryClient.createInventory(inventoryRequest);
+
+        return savedProduct;
     }
 
     @CircuitBreaker(name = "inventory-service", fallbackMethod = "reserveFallback")

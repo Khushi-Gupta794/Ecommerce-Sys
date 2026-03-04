@@ -18,6 +18,16 @@ repositories {
 	mavenCentral()
 }
 
+ext {
+    set('springCloudVersion', "2023.0.1")
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
+}
+
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-graphql'
@@ -30,6 +40,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     implementation 'org.springframework.boot:spring-boot-starter-cache'
     implementation 'org.springframework.boot:spring-boot-starter-aop'
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+    // Circuit Breaker (Resilience4j)
+    implementation 'org.springframework.cloud:spring-cloud-starter-circuitbreaker-resilience4j'
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'

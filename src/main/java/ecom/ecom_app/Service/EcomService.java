@@ -1,10 +1,12 @@
 package ecom.ecom_app.Service;
 import ecom.ecom_app.AOP.CustomAnnotationAop;
 import ecom.ecom_app.Entity.*;
+import ecom.ecom_app.FeignClient.InventoryClient;
 import ecom.ecom_app.ProductNotFoundExp;
 import ecom.ecom_app.Repo.OrderRepo;
 import ecom.ecom_app.Repo.ProductRepo;
 import ecom.ecom_app.Repo.UserRepo;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -26,6 +28,9 @@ public class EcomService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private InventoryClient inventoryClient;
 
     // -------- Queries --------
 
@@ -80,6 +85,7 @@ public class EcomService {
         return productRepo.save(product);
     }
 
+    @CircuitBreaker(name = "inventory-service", fallbackMethod = "reserveFallback")
     @CustomAnnotationAop("Creating new order")
     @Transactional
     public Order createOrder(Long productId, int quantity, String email){
@@ -90,11 +96,17 @@ public class EcomService {
         Product product = productRepo.findById(productId)
                 .orElseThrow(() -> new ProductNotFoundExp("Product not found"));
 
-        if(product.getStock() < quantity){
-            throw new RuntimeException("not enough stock");
+//        if(product.getStock() < quantity){
+//            throw new RuntimeException("not enough stock");
+//        }
+
+        boolean inStock = inventoryClient.checkStock(productId, quantity);
+
+        if(!inStock){
+            throw new RuntimeException("Product out of stock or Inventory service unavailable");
         }
 
-        product.setStock(product.getStock() - quantity);
+       // product.setStock(product.getStock() - quantity);
         productRepo.save(product);
 
         Order order = new Order();
@@ -110,5 +122,11 @@ public class EcomService {
         order.setOrderItems(List.of(item));
 
         return orderRepo.save(order);
+    }
+
+    //fallback method
+    public Order reserveFallback(Long productId, int quantity, String email, Throwable ex) {
+    System.out.println("Circuit Breaker Triggered: " + ex.getMessage());
+    throw new RuntimeException("Inventory service is down. Please try later.");
     }
 }
